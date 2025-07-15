@@ -1,13 +1,11 @@
 import axios from 'axios';
 import { UrlResult } from './index';
 
-const API_BASE_URL = 'http://localhost:8082';
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIn0.qQSekbR5BFKQPc3_7gUiDY6Q9y7RojKzvBTLJ9jGtec"; // 🔁 Replace with dynamic token in production
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8082';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
   },
 });
@@ -15,11 +13,13 @@ const axiosInstance = axios.create({
 export const postUrl = async (url: string): Promise<UrlResult> => {
   try {
     const response = await axiosInstance.post('/urls', { url });
+    console.log('postUrl Response:', response.data);
     return response.data;
   } catch (err) {
     const message = axios.isAxiosError(err) && err.response?.data?.error
-      ? `Failed to submit URL: ${err.response.data.error}`
-      : 'Failed to submit URL';
+      ? `Failed to submit URL: ${err.response.status} - ${err.response.data.error}`
+      : `Failed to submit URL: ${err.message}`;
+    console.error('postUrl Error:', message);
     throw new Error(message);
   }
 };
@@ -27,11 +27,13 @@ export const postUrl = async (url: string): Promise<UrlResult> => {
 export const getResults = async (): Promise<UrlResult[]> => {
   try {
     const response = await axiosInstance.get('/results');
+    console.log('getResults Response:', response.data);
     return response.data;
   } catch (err) {
     const message = axios.isAxiosError(err) && err.response?.data?.error
-      ? `Failed to fetch results: ${err.response.data.error}`
-      : 'Failed to fetch results';
+      ? `Failed to fetch results: ${err.response.status} - ${err.response.data.error}`
+      : `Failed to fetch results: ${err.message}`;
+    console.error('getResults Error:', message);
     throw new Error(message);
   }
 };
@@ -41,8 +43,9 @@ export const deleteResult = async (id: number): Promise<void> => {
     await axiosInstance.delete(`/results/${id}`);
   } catch (err) {
     const message = axios.isAxiosError(err) && err.response?.data?.error
-      ? `Failed to delete result: ${err.response.data.error}`
-      : 'Failed to delete result';
+      ? `Failed to delete result: ${err.response.status} - ${err.response.data.error}`
+      : `Failed to delete result: ${err.message}`;
+    console.error('deleteResult Error:', err);
     throw new Error(message);
   }
 };

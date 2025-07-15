@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { postUrl } from '../utils/api';
-import { CrawlResult } from '../types';
+import { UrlResult } from '../utils';
 
 const UrlInput: React.FC = () => {
   const [url, setUrl] = useState('');
@@ -9,53 +9,55 @@ const UrlInput: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted with URL:', url);
+    
     if (!url.match(/^https?:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/.*)?$/)) {
+      console.log('Invalid URL format:', url);
       setError('Please enter a valid URL (e.g., https://example.com)');
       return;
     }
+
     setIsLoading(true);
+    console.log('Sending POST request for URL:', url);
     try {
-      const response: CrawlResult = await postUrl(url);
+      const response: UrlResult = await postUrl(url);
+      console.log('postUrl success:', response);
       setUrl('');
       setError('');
     } catch (err) {
+      console.error('postUrl failed:', err);
       setError('Failed to submit URL. Please try again.');
     } finally {
       setIsLoading(false);
+      console.log('Form submission completed, isLoading:', false);
     }
   };
 
   return (
-    <div className="p-4">
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2"
-        aria-label="URL submission form"
-      >
+    <form onSubmit={handleSubmit} className="mb-4">
+      <div className="flex flex-col sm:flex-row gap-2">
         <input
-          type="url"
+          type="text"
           value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          onChange={(e) => {
+            console.log('Input changed:', e.target.value);
+            setUrl(e.target.value);
+            setError('');
+          }}
           placeholder="Enter URL (e.g., https://example.com)"
-          className="p-2 border rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-          aria-label="Enter URL to analyze"
+          className="flex-grow p-2 border rounded"
+          disabled={isLoading}
         />
         <button
           type="submit"
-          className="p-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-blue-300"
           disabled={isLoading}
-          aria-label="Analyze URL"
         >
           {isLoading ? 'Analyzing...' : 'Analyze'}
         </button>
-      </form>
-      {error && (
-        <p className="text-red-500 mt-2" role="alert">
-          {error}
-        </p>
-      )}
-    </div>
+      </div>
+      {error && <p className="text-red-500 mt-2">{error}</p>}
+    </form>
   );
 };
 

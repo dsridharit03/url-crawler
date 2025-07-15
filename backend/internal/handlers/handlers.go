@@ -3,9 +3,10 @@ package handlers
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 	"url-crawler/internal/crawler"
-	dbpkg "url-crawler/internal/db" // ✅ Import your db package with alias
+	dbpkg "url-crawler/internal/db"
 	"url-crawler/internal/models"
 
 	"github.com/gin-gonic/gin"
@@ -24,13 +25,17 @@ func UrlHandler(db *sql.DB) gin.HandlerFunc {
 			URL string `json:"url"`
 		}
 		if err := c.ShouldBindJSON(&req); err != nil {
+			log.Printf("Error binding JSON: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
+		log.Printf("Received URL for crawling: %s", req.URL)
+
 		// Run crawl
 		result, err := crawler.Crawl(c, req.URL)
 		if err != nil {
+			log.Printf("Crawl failed for URL %s: %v", req.URL, err)
 			result = &models.UrlResult{
 				URL:           req.URL,
 				Status:        "error",
@@ -47,21 +52,25 @@ func UrlHandler(db *sql.DB) gin.HandlerFunc {
 				InternalLinks: 0,
 				ExternalLinks: 0,
 			}
+		} else {
+			log.Printf("Crawl successful for URL %s: %+v", req.URL, result)
 		}
 
-		// ✅ Save result using db package
+		// Save result using db package
 		if err := dbpkg.SaveResult(db, result); err != nil {
+			log.Printf("Error saving result to database for URL %s: %v", req.URL, err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
+		log.Printf("Result saved to database for URL %s", req.URL)
 		c.JSON(http.StatusOK, gin.H{"message": "Crawl completed", "url": req.URL})
 	}
 }
 
 func ResultsHandler(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		results, err := dbpkg.GetResults(db) // ✅ Use db package
+		results, err := dbpkg.GetResults(db)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -73,7 +82,7 @@ func ResultsHandler(db *sql.DB) gin.HandlerFunc {
 func ResultDetailHandler(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
-		results, err := dbpkg.GetResults(db) // ✅ Use db package
+		results, err := dbpkg.GetResults(db)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return

@@ -28,7 +28,9 @@ func Crawl(ctx context.Context, rawURL string) (*models.UrlResult, error) {
 		InternalLinks: 0,
 		ExternalLinks: 0,
 	}
-	c := colly.NewCollector()
+	c := colly.NewCollector(
+		colly.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"),
+	)
 
 	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
