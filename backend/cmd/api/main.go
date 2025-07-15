@@ -10,19 +10,15 @@ import (
 )
 
 func main() {
-	// Initialize database connection
 	database, err := db.InitDB()
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
-	// Initialize Gin router
 	router := gin.Default()
-
-	// Apply CORS middleware if needed
 	router.Use(middleware.CORSMiddleware())
 
-	// ✅ Root Route
+	// ✅ Add root route
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "🚀 URL Crawler API is running!",
@@ -47,7 +43,7 @@ func main() {
 		})
 	}
 
-	// Start the server
+	// Run server on port 8082
 	err = router.Run(":8082")
 	if err != nil {
 		log.Fatal("Failed to start server:", err)
