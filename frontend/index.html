@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>URL Crawler</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-100 font-sans">
   <div class="container mx-auto p-6">
@@ -22,9 +23,13 @@
         >
         <button
           onclick="analyzeURL()"
-          class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+          id="analyzeBtn"
+          class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center"
         >
-          Analyze
+          <span id="analyzeText">Analyze</span>
+          <span id="analyzeSpinner" class="ml-2 hidden">
+            <i class="fas fa-spinner fa-spin"></i>
+          </span>
         </button>
       </div>
     </div>
@@ -54,6 +59,8 @@
           >
             <option value="">All HTML Versions</option>
             <option value="HTML5">HTML5</option>
+            <option value="HTML4">HTML4</option>
+            <option value="XHTML">XHTML</option>
             <option value="Other">Other</option>
           </select>
           <select
@@ -63,15 +70,20 @@
           >
             <option value="">All Statuses</option>
             <option value="done">Done</option>
-            <option value="pending">Pending</option>
+            <option value="running">Running</option>
+            <option value="error">Error</option>
           </select>
         </div>
         <div class="flex gap-4">
           <button
             onclick="rerunSelected()"
-            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+            id="rerunBtn"
+            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center"
           >
-            Re-run Selected
+            <span>Re-run Selected</span>
+            <span id="rerunSpinner" class="ml-2 hidden">
+              <i class="fas fa-spinner fa-spin"></i>
+            </span>
           </button>
           <button
             onclick="deleteSelected()"
@@ -88,6 +100,7 @@
           <thead>
             <tr class="bg-gray-200 text-gray-800">
               <th class="p-3 border-b text-left"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></th>
+              <th class="p-3 border-b text-left">URL</th>
               <th class="p-3 border-b text-left">Title</th>
               <th class="p-3 border-b text-left">HTML Version</th>
               <th class="p-3 border-b text-left">H1 Count</th>
@@ -102,110 +115,206 @@
               <th class="p-3 border-b text-left">Status</th>
             </tr>
           </thead>
-          <tbody>
-            <tr class="hover:bg-gray-50 transition">
-              <td class="p-3 border-b"><input type="checkbox" class="rowCheckbox"></td>
-              <td class="p-3 border-b">Example Domain</td>
-              <td class="p-3 border-b">Other</td>
-              <td class="p-3 border-b">1</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">1</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b text-green-600">done</td>
-            </tr>
-            <tr class="hover:bg-gray-50 transition">
-              <td class="p-3 border-b"><input type="checkbox" class="rowCheckbox"></td>
-              <td class="p-3 border-b">W3Schools Online Web Tutorials</td>
-              <td class="p-3 border-b">Other</td>
-              <td class="p-3 border-b">14</td>
-              <td class="p-3 border-b">60</td>
-              <td class="p-3 border-b">30</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">2</td>
-              <td class="p-3 border-b">188</td>
-              <td class="p-3 border-b">22</td>
-              <td class="p-3 border-b text-green-600">done</td>
-            </tr>
-            <tr class="hover:bg-gray-50 transition">
-              <td class="p-3 border-b"><input type="checkbox" class="rowCheckbox"></td>
-              <td class="p-3 border-b">Tpoint Tech - Free Online Tutorials</td>
-              <td class="p-3 border-b">Other</td>
-              <td class="p-3 border-b">1</td>
-              <td class="p-3 border-b">1</td>
-              <td class="p-3 border-b">34</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">5</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">8</td>
-              <td class="p-3 border-b">3</td>
-              <td class="p-3 border-b text-green-600">done</td>
-            </tr>
-            <tr class="hover:bg-gray-50 transition">
-              <td class="p-3 border-b"><input type="checkbox" class="rowCheckbox"></td>
-              <td class="p-3 border-b">India tour of England 2025 | Live Cricket Score, Schedule, Latest News, Stats & Videos | Cricbuzz.com</td>
-              <td class="p-3 border-b">Other</td>
-              <td class="p-3 border-b">1</td>
-,              <td class="p-3 border-b">13</td>
-              <td class="p-3 border-b">3</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">0</td>
-              <td class="p-3 border-b">10</td>
-              <td class="p-3 border-b">1</td>
-              <td class="p-3 border-b text-green-600">done</td>
-            </tr>
+          <tbody id="resultsBody">
+            <!-- Results will be populated here -->
           </tbody>
         </table>
       </div>
 
+      <!-- Empty State -->
+      <div id="emptyState" class="text-center py-8">
+        <i class="fas fa-search text-gray-400 text-4xl mb-4"></i>
+        <p class="text-gray-600">No crawl results yet. Enter a URL to analyze.</p>
+      </div>
+
       <!-- Pagination -->
       <div class="flex justify-between mt-4">
-        <button class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition" disabled>Previous</button>
-        <span class="text-gray-800">Page 1 of 1</span>
-        <button class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition" disabled>Next</button>
+        <button id="prevPage" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition" disabled>Previous</button>
+        <span id="pageInfo" class="text-gray-800">Page 1 of 1</span>
+        <button id="nextPage" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition" disabled>Next</button>
       </div>
     </div>
   </div>
 
   <script>
-    function analyzeURL() {
-      const url = document.getElementById('urlInput').value;
-      if (url) {
-        alert('Analyzing URL: ' + url);
-        // Add logic to process URL and update table
-      } else {
-        alert('Please enter a valid URL');
+    // Configuration
+    const API_BASE_URL = 'http://localhost:8082';
+    let currentPage = 1;
+    let totalPages = 1;
+    let allResults = [];
+
+    // DOM Elements
+    const resultsBody = document.getElementById('resultsBody');
+    const emptyState = document.getElementById('emptyState');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const analyzeText = document.getElementById('analyzeText');
+    const analyzeSpinner = document.getElementById('analyzeSpinner');
+    const rerunBtn = document.getElementById('rerunBtn');
+    const rerunSpinner = document.getElementById('rerunSpinner');
+    const prevPageBtn = document.getElementById('prevPage');
+    const nextPageBtn = document.getElementById('nextPage');
+    const pageInfo = document.getElementById('pageInfo');
+
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchResults();
+    });
+
+    // Fetch all results from the backend
+    async function fetchResults() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/results`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch results');
+        }
+        allResults = await response.json();
+        updateTable();
+      } catch (error) {
+        console.error('Error fetching results:', error);
+        alert('Error fetching results: ' + error.message);
       }
     }
 
+    // Update the table with current results
+    function updateTable(filteredResults = null) {
+      const resultsToDisplay = filteredResults || allResults;
+      
+      if (resultsToDisplay.length === 0) {
+        emptyState.style.display = 'block';
+        resultsBody.innerHTML = '';
+        return;
+      }
+      
+      emptyState.style.display = 'none';
+      
+      // Calculate pagination
+      totalPages = Math.ceil(resultsToDisplay.length / 10);
+      currentPage = Math.min(currentPage, totalPages);
+      
+      // Get results for current page
+      const startIdx = (currentPage - 1) * 10;
+      const endIdx = Math.min(startIdx + 10, resultsToDisplay.length);
+      const pageResults = resultsToDisplay.slice(startIdx, endIdx);
+      
+      // Update pagination controls
+      updatePaginationControls();
+      
+      // Clear existing rows
+      resultsBody.innerHTML = '';
+      
+      // Add new rows
+      pageResults.forEach(result => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-50 transition';
+        row.innerHTML = `
+          <td class="p-3 border-b"><input type="checkbox" class="rowCheckbox" data-id="${result.id}"></td>
+          <td class="p-3 border-b truncate max-w-xs" title="${result.url}">${result.url}</td>
+          <td class="p-3 border-b truncate max-w-xs" title="${result.title}">${result.title}</td>
+          <td class="p-3 border-b">${result.html_version || 'Unknown'}</td>
+          <td class="p-3 border-b">${result.h1_count}</td>
+          <td class="p-3 border-b">${result.h2_count}</td>
+          <td class="p-3 border-b">${result.h3_count}</td>
+          <td class="p-3 border-b">${result.h4_count}</td>
+          <td class="p-3 border-b">${result.h5_count}</td>
+          <td class="p-3 border-b">${result.h6_count}</td>
+          <td class="p-3 border-b">${result.internal_links}</td>
+          <td class="p-3 border-b">${result.external_links}</td>
+          <td class="p-3 border-b">${result.broken_links ? result.broken_links.length : 0}</td>
+          <td class="p-3 border-b ${getStatusColor(result.status)}">${result.status}</td>
+        `;
+        resultsBody.appendChild(row);
+      });
+    }
+
+    function getStatusColor(status) {
+      switch (status) {
+        case 'done': return 'text-green-600';
+        case 'running': return 'text-yellow-600';
+        case 'error': return 'text-red-600';
+        default: return 'text-gray-600';
+      }
+    }
+
+    function updatePaginationControls() {
+      pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+      prevPageBtn.disabled = currentPage <= 1;
+      nextPageBtn.disabled = currentPage >= totalPages;
+    }
+
+    // Analyze a new URL
+    async function analyzeURL() {
+      const urlInput = document.getElementById('urlInput');
+      const url = urlInput.value.trim();
+      
+      if (!url) {
+        alert('Please enter a URL');
+        return;
+      }
+      
+      try {
+        // Validate URL
+        new URL(url);
+      } catch (e) {
+        alert('Please enter a valid URL (e.g., https://example.com)');
+        return;
+      }
+      
+      // Show loading state
+      analyzeText.textContent = 'Analyzing...';
+      analyzeSpinner.classList.remove('hidden');
+      analyzeBtn.disabled = true;
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/urls`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url })
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to analyze URL');
+        }
+        
+        const data = await response.json();
+        alert(`URL analysis completed: ${data.message}`);
+        urlInput.value = '';
+        
+        // Refresh results
+        await fetchResults();
+      } catch (error) {
+        console.error('Error analyzing URL:', error);
+        alert('Error analyzing URL: ' + error.message);
+      } finally {
+        // Reset button state
+        analyzeText.textContent = 'Analyze';
+        analyzeSpinner.classList.add('hidden');
+        analyzeBtn.disabled = false;
+      }
+    }
+
+    // Filter the table based on search and filters
     function filterTable() {
       const search = document.getElementById('searchInput').value.toLowerCase();
       const htmlVersion = document.getElementById('htmlVersionFilter').value;
       const status = document.getElementById('statusFilter').value;
-      const rows = document.querySelectorAll('#resultsTable tbody tr');
-
-      rows.forEach(row => {
-        const title = row.cells[1].textContent.toLowerCase();
-        const version = row.cells[2].textContent;
-        const rowStatus = row.cells[12].textContent;
-
-        const matchesSearch = title.includes(search);
-        const matchesVersion = !htmlVersion || version === htmlVersion;
-        const matchesStatus = !status || rowStatus === status;
-
-        row.style.display = matchesSearch && matchesVersion && matchesStatus ? '' : 'none';
+      
+      const filteredResults = allResults.filter(result => {
+        const matchesSearch = result.url.toLowerCase().includes(search) || 
+                            result.title.toLowerCase().includes(search);
+        const matchesVersion = !htmlVersion || result.html_version === htmlVersion;
+        const matchesStatus = !status || result.status === status;
+        
+        return matchesSearch && matchesVersion && matchesStatus;
       });
+      
+      currentPage = 1;
+      updateTable(filteredResults);
     }
 
+    // Toggle select all checkboxes
     function toggleSelectAll() {
       const selectAll = document.getElementById('selectAll').checked;
       document.querySelectorAll('.rowCheckbox').forEach(checkbox => {
@@ -213,28 +322,142 @@
       });
     }
 
-    function rerunSelected() {
-      const selected = document.querySelectorAll('.rowCheckbox:checked');
-      if (selected.length > 0) {
-        alert(`${selected.length} URL(s) selected for re-run`);
-        // Add logic to re-run selected URLs
-      } else {
+    // Re-run selected URLs
+    async function rerunSelected() {
+      const selectedCheckboxes = document.querySelectorAll('.rowCheckbox:checked');
+      
+      if (selectedCheckboxes.length === 0) {
         alert('Please select at least one URL');
+        return;
+      }
+      
+      if (!confirm(`Re-run analysis for ${selectedCheckboxes.length} selected URL(s)?`)) {
+        return;
+      }
+      
+      // Show loading state
+      rerunSpinner.classList.remove('hidden');
+      rerunBtn.disabled = true;
+      
+      try {
+        const ids = Array.from(selectedCheckboxes).map(cb => cb.dataset.id);
+        
+        // Re-run each selected URL
+        for (const id of ids) {
+          const result = allResults.find(r => r.id == id);
+          if (result) {
+            await fetch(`${API_BASE_URL}/urls`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ url: result.url })
+            });
+          }
+        }
+        
+        alert(`Re-run initiated for ${ids.length} URL(s)`);
+        await fetchResults();
+      } catch (error) {
+        console.error('Error re-running URLs:', error);
+        alert('Error re-running URLs: ' + error.message);
+      } finally {
+        // Reset button state
+        rerunSpinner.classList.add('hidden');
+        rerunBtn.disabled = false;
       }
     }
 
-    function deleteSelected() {
-      const selected = document.querySelectorAll('.rowCheckbox:checked');
-      if (selected.length > 0) {
-        if (confirm(`Are you sure you want to delete ${selected.length} URL(s)?`)) {
-          selected.forEach(checkbox => {
-            checkbox.closest('tr').remove();
-          });
-        }
-      } else {
+    // Delete selected URLs
+    async function deleteSelected() {
+    const selectedCheckboxes = document.querySelectorAll('.rowCheckbox:checked');
+    
+    if (selectedCheckboxes.length === 0) {
         alert('Please select at least one URL');
-      }
+        return;
     }
+
+    const selectedCount = selectedCheckboxes.length;
+    if (!confirm(`Delete ${selectedCount} selected URL(s)? This cannot be undone.`)) {
+        return;
+    }
+
+    try {
+        // Get the token from where you store it (localStorage, cookies, etc.)
+        const token = localStorage.getItem('token'); // Adjust based on your auth storage
+        
+        if (!token) {
+        alert('Authorization token missing. Please log in again.');
+        return;
+        }
+
+        const deletePromises = [];
+        const failedDeletions = [];
+        
+        for (const checkbox of selectedCheckboxes) {
+        const id = checkbox.dataset.id;
+        deletePromises.push(
+            fetch(`${API_BASE_URL}/results/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+            })
+            .then(async response => {
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Failed to delete ID ${id}`);
+            }
+            return id;
+            })
+            .catch(error => {
+            failedDeletions.push({id, error: error.message});
+            return null;
+            })
+        );
+        }
+
+        const results = await Promise.all(deletePromises);
+        const successfulDeletions = results.filter(id => id !== null);
+
+        if (failedDeletions.length > 0) {
+        let errorMessage = `Failed to delete ${failedDeletions.length} URL(s):\n`;
+        failedDeletions.forEach(f => {
+            errorMessage += `• ID ${f.id}: ${f.error}\n`;
+        });
+        
+        if (successfulDeletions.length > 0) {
+            errorMessage = `Deleted ${successfulDeletions.length} URL(s) successfully.\n\n${errorMessage}`;
+        }
+        
+        alert(errorMessage);
+        } else {
+        alert(`Successfully deleted ${successfulDeletions.length} URL(s)`);
+        }
+
+        await fetchResults();
+        
+    } catch (error) {
+        console.error('Error deleting URLs:', error);
+        alert('Error deleting URLs: ' + error.message);
+    }
+    }
+
+    // Pagination handlers
+    prevPageBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        updateTable();
+      }
+    });
+
+    nextPageBtn.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        updateTable();
+      }
+    });
   </script>
 </body>
 </html>
