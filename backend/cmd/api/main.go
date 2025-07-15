@@ -10,15 +10,17 @@ import (
 )
 
 func main() {
+	// Connect to DB
 	database, err := db.InitDB()
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
+	// Create router
 	router := gin.Default()
 	router.Use(middleware.CORSMiddleware())
 
-	// ✅ Add root route
+	// ✅ Add root route for Render test
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "🚀 URL Crawler API is running!",
@@ -26,26 +28,11 @@ func main() {
 		})
 	})
 
-	// API routes
-	api := router.Group("/api")
-	{
-		api.POST("/submit", func(c *gin.Context) {
-			handlers.SubmitURLHandler(c, database)
-		})
-		api.GET("/results", func(c *gin.Context) {
-			handlers.GetResultsHandler(c, database)
-		})
-		api.DELETE("/results/:id", func(c *gin.Context) {
-			handlers.DeleteResultHandler(c, database)
-		})
-		api.POST("/rerun/:id", func(c *gin.Context) {
-			handlers.RerunCrawlHandler(c, database)
-		})
-	}
+	// ✅ Register your handlers with DB
+	handlers.RegisterRoutes(router, database)
 
-	// Run server on port 8082
-	err = router.Run(":8082")
-	if err != nil {
+	// Run server
+	if err := router.Run(":8082"); err != nil {
 		log.Fatal("Failed to start server:", err)
 	}
 }
