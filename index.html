@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Crawler</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="container mx-auto p-6">
+    <!-- Header -->
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">URL Crawler</h1>
+
+    <!-- URL Input Form -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+      <div class="flex flex-col sm:flex-row gap-4">
+        <input
+          type="text"
+          id="urlInput"
+          placeholder="Enter URL (e.g., https://example.com)"
+          class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+        <button
+          onclick="analyzeURL()"
+          class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+        >
+          Analyze
+        </button>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">URL Crawler Results</h2>
+
+      <!-- Search Bar -->
+      <div class="mb-4">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search by URL or title..."
+          class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onkeyup="filterTable()"
+        >
+      </div>
+
+      <!-- Filters and Actions -->
+      <div class="flex flex-col sm:flex-row justify-between mb-4 gap-4">
+        <div class="flex gap-4">
+          <select
+            id="htmlVersionFilter"
+            onchange="filterTable()"
+            class="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All HTML Versions</option>
+            <option value="HTML5">HTML5</option>
+            <option value="Other">Other</option>
+          </select>
+          <select
+            id="statusFilter"
+            onchange="filterTable()"
+            class="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Statuses</option>
+            <option value="done">Done</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
+        <div class="flex gap-4">
+          <button
+            onclick="rerunSelected()"
+            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+          >
+            Re-run Selected
+          </button>
+          <button
+            onclick="deleteSelected()"
+            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+          >
+            Delete Selected
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table id="resultsTable" class="min-w-full bg-white border border-gray-300">
+          <thead>
+            <tr class="bg-gray-200 text-gray-800">
+              <th class="p-3 border-b text-left"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></th>
+              <th class="p-3 border-b text-left">Title</th>
+              <th class="p-3 border-b text-left">HTML Version</th>
+              <th class="p-3 border-b text-left">H1 Count</th>
+              <th class="p-3 border-b text-left">H2 Count</th>
+              <th class="p-3 border-b text-left">H3 Count</th>
+              <th class="p-3 border-b text-left">H4 Count</th>
+              <th class="p-3 border-b text-left">H5 Count</th>
+              <th class="p-3 border-b text-left">H6 Count</th>
+              <th class="p-3 border-b text-left">Internal Links</th>
+              <th class="p-3 border-b text-left">External Links</th>
+              <th class="p-3 border-b text-left">Broken Links</th>
+              <th class="p-3 border-b text-left">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="hover:bg-gray-50 transition">
+              <td class="p-3 border-b"><input type="checkbox" class="rowCheckbox"></td>
+              <td class="p-3 border-b">Example Domain</td>
+              <td class="p-3 border-b">Other</td>
+              <td class="p-3 border-b">1</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">1</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b text-green-600">done</td>
+            </tr>
+            <tr class="hover:bg-gray-50 transition">
+              <td class="p-3 border-b"><input type="checkbox" class="rowCheckbox"></td>
+              <td class="p-3 border-b">W3Schools Online Web Tutorials</td>
+              <td class="p-3 border-b">Other</td>
+              <td class="p-3 border-b">14</td>
+              <td class="p-3 border-b">60</td>
+              <td class="p-3 border-b">30</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">2</td>
+              <td class="p-3 border-b">188</td>
+              <td class="p-3 border-b">22</td>
+              <td class="p-3 border-b text-green-600">done</td>
+            </tr>
+            <tr class="hover:bg-gray-50 transition">
+              <td class="p-3 border-b"><input type="checkbox" class="rowCheckbox"></td>
+              <td class="p-3 border-b">Tpoint Tech - Free Online Tutorials</td>
+              <td class="p-3 border-b">Other</td>
+              <td class="p-3 border-b">1</td>
+              <td class="p-3 border-b">1</td>
+              <td class="p-3 border-b">34</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">5</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">8</td>
+              <td class="p-3 border-b">3</td>
+              <td class="p-3 border-b text-green-600">done</td>
+            </tr>
+            <tr class="hover:bg-gray-50 transition">
+              <td class="p-3 border-b"><input type="checkbox" class="rowCheckbox"></td>
+              <td class="p-3 border-b">India tour of England 2025 | Live Cricket Score, Schedule, Latest News, Stats & Videos | Cricbuzz.com</td>
+              <td class="p-3 border-b">Other</td>
+              <td class="p-3 border-b">1</td>
+,              <td class="p-3 border-b">13</td>
+              <td class="p-3 border-b">3</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">0</td>
+              <td class="p-3 border-b">10</td>
+              <td class="p-3 border-b">1</td>
+              <td class="p-3 border-b text-green-600">done</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="flex justify-between mt-4">
+        <button class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition" disabled>Previous</button>
+        <span class="text-gray-800">Page 1 of 1</span>
+        <button class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition" disabled>Next</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function analyzeURL() {
+      const url = document.getElementById('urlInput').value;
+      if (url) {
+        alert('Analyzing URL: ' + url);
+        // Add logic to process URL and update table
+      } else {
+        alert('Please enter a valid URL');
+      }
+    }
+
+    function filterTable() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const htmlVersion = document.getElementById('htmlVersionFilter').value;
+      const status = document.getElementById('statusFilter').value;
+      const rows = document.querySelectorAll('#resultsTable tbody tr');
+
+      rows.forEach(row => {
+        const title = row.cells[1].textContent.toLowerCase();
+        const version = row.cells[2].textContent;
+        const rowStatus = row.cells[12].textContent;
+
+        const matchesSearch = title.includes(search);
+        const matchesVersion = !htmlVersion || version === htmlVersion;
+        const matchesStatus = !status || rowStatus === status;
+
+        row.style.display = matchesSearch && matchesVersion && matchesStatus ? '' : 'none';
+      });
+    }
+
+    function toggleSelectAll() {
+      const selectAll = document.getElementById('selectAll').checked;
+      document.querySelectorAll('.rowCheckbox').forEach(checkbox => {
+        checkbox.checked = selectAll;
+      });
+    }
+
+    function rerunSelected() {
+      const selected = document.querySelectorAll('.rowCheckbox:checked');
+      if (selected.length > 0) {
+        alert(`${selected.length} URL(s) selected for re-run`);
+        // Add logic to re-run selected URLs
+      } else {
+        alert('Please select at least one URL');
+      }
+    }
+
+    function deleteSelected() {
+      const selected = document.querySelectorAll('.rowCheckbox:checked');
+      if (selected.length > 0) {
+        if (confirm(`Are you sure you want to delete ${selected.length} URL(s)?`)) {
+          selected.forEach(checkbox => {
+            checkbox.closest('tr').remove();
+          });
+        }
+      } else {
+        alert('Please select at least one URL');
+      }
+    }
+  </script>
+</body>
+</html>
