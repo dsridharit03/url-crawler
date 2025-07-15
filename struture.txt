@@ -1,0 +1,62 @@
+this is my project stutue
+url-crawler/
+├── backend/
+│   ├── cmd/
+│   │   └── api/
+│   │       └── main.go
+│   ├── internal/
+│   │   ├── crawler/
+│   │   │   ├── crawler.go
+│   │   │   └── crawler_test.go
+│   │   ├── handlers/
+│   │   │   ├── handlers.go
+│   │   │   └── handlers_test.go
+│   │   ├── models/
+│   │   │   └── models.go
+│   │   ├── db/
+│   │   │   ├── db.go
+│   │   │   └── migrations/
+│   │   │       └── 001_init.sql
+│   │   └── middleware/
+│   │       └── auth.go
+│   ├── go.mod
+│   ├── go.sum
+│   └── Dockerfile
+├── frontend/
+│   ├── public/
+│   │   ├── index.html
+│   │   └── favicon.ico
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── UrlInput.tsx
+│   │   │   ├── ResultsTable.tsx
+│   │   │   ├── DetailsView.tsx
+│   │   │   ├── BulkActions.tsx
+│   │   │   └── StatusIndicator.tsx
+│   │   ├── pages/
+│   │   │   ├── Home.tsx
+│   │   │   └── Details.tsx
+│   │   ├── hooks/
+│   │   │   └── useApi.ts
+│   │   ├── types/
+│   │   │   └── index.ts
+│   │   ├── utils/
+│   │   │   └── api.ts
+│   │   ├── assets/
+│   │   │   └── styles.css
+│   │   ├── tests/
+│   │   │   ├── UrlInput.test.tsx
+│   │   │   ├── ResultsTable.test.tsx
+│   │   │   └── DetailsView.test.tsx
+│   │   ├── App.tsx
+│   │   ├── index.tsx
+│   │   └── setupTests.ts
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── tailwind.config.js
+│   └── Dockerfile
+├── scripts/
+│   └── seed.sql
+├── docker-compose.yml
+├── README.md
+└── .gitignore

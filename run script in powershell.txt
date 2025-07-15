@@ -1,0 +1,8 @@
+Backend run in powershell
+cd  your_project_Location\backend> go run cmd/api/main.go
+
+Frontend run in in powershell
+cd your_project_Location\frontend> npm run start
+
+http://localhost:5173/
+

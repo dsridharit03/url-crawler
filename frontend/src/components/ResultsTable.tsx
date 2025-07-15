@@ -19,7 +19,7 @@ const ResultsTable: React.FC = () => {
     const fetchResults = async () => {
       try {
         const data = await getResults();
-        console.log('Fetched results:', data); // Debug log
+        console.log('Fetched results:', data);
         setResults(data || []);
         setError('');
       } catch (err) {
@@ -27,7 +27,7 @@ const ResultsTable: React.FC = () => {
       }
     };
     fetchResults();
-    const interval = setInterval(fetchResults, 15000); // 15s polling
+    const interval = setInterval(fetchResults, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -87,8 +87,8 @@ const ResultsTable: React.FC = () => {
           (r.title || '').toLowerCase().includes(search.toLowerCase()))
     )
     .sort((a, b) => {
-      const aVal = a[sortField] ?? '';
-      const bVal = b[sortField] ?? '';
+      const aVal = sortField === 'broken_links' ? (a.broken_links?.length ?? 0) : (a[sortField] ?? '');
+      const bVal = sortField === 'broken_links' ? (b.broken_links?.length ?? 0) : (b[sortField] ?? '');
       if (aVal === bVal) return 0;
       return sortOrder === 'asc' ? (aVal > bVal ? 1 : -1) : (aVal < bVal ? 1 : -1);
     });
@@ -96,20 +96,23 @@ const ResultsTable: React.FC = () => {
   const paginatedResults = filteredResults.slice((page - 1) * 10, page * 10);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-white rounded-lg shadow-md">
-      <div className="flex flex-col sm:flex-row sm:space-x-4 mb-6 gap-4">
+    <div className="p-8 max-w-7xl mx-auto bg-white rounded-xl shadow-2xl">
+      <h1 className="text-4xl font-extrabold text-purple-700 mb-8 tracking-tight hover:text-purple-800 transition-all duration-300">
+        URL Crawler Results
+      </h1>
+      <div className="flex flex-col sm:flex-row sm:space-x-4 mb-8 gap-4">
         <input
           type="text"
           placeholder="Search by URL or title..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="p-3 border border-gray-300 rounded-lg w-full sm:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          className="p-4 border-4 border-blue-500 rounded-xl w-full sm:w-1/3 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 bg-white shadow-md hover:shadow-lg"
           aria-label="Search results"
         />
         <select
           value={htmlFilter}
           onChange={(e) => setHtmlFilter(e.target.value)}
-          className="p-3 border border-gray-300 rounded-lg w-full sm:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          className="p-4 border-4 border-blue-500 rounded-xl w-full sm:w-1/4 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 bg-white shadow-md hover:shadow-lg"
           aria-label="Filter by HTML version"
         >
           <option value="">All HTML Versions</option>
@@ -119,7 +122,7 @@ const ResultsTable: React.FC = () => {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="p-3 border border-gray-300 rounded-lg w-full sm:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          className="p-4 border-4 border-blue-500 rounded-xl w-full sm:w-1/4 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 bg-white shadow-md hover:shadow-lg"
           aria-label="Filter by status"
         >
           <option value="">All Statuses</option>
@@ -128,27 +131,31 @@ const ResultsTable: React.FC = () => {
         </select>
       </div>
       {error && (
-        <p className="text-red-600 mb-4 font-medium" role="alert">
+        <p className="text-red-600 mb-6 font-semibold bg-red-100 p-4 rounded-xl shadow-md hover:bg-red-200 transition-all duration-300" role="alert">
           {error}
         </p>
       )}
-      {/* Single BulkActions render */}
-      <BulkActions onRerun={handleRerun} onDelete={handleDelete} disabled={selectedIds.length === 0} />
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse rounded-lg overflow-hidden" role="grid">
+      <BulkActions
+        onRerun={handleRerun}
+        onDelete={handleDelete}
+        disabled={selectedIds.length === 0}
+        className="mb-8"
+      />
+      <div className="overflow-x-auto rounded-xl shadow-md">
+        <table className="w-full rounded-xl" role="grid">
           <thead>
-            <tr className="bg-blue-100 text-gray-800">
-              <th className="border border-gray-200 p-3">
+            <tr>
+              <th>
                 <input
                   type="checkbox"
                   onChange={(e) => setSelectedIds(e.target.checked ? filteredResults.map((r) => r.id) : [])}
-                  className="rounded"
+                  className="rounded text-blue-600 focus:ring-blue-300"
                   aria-label="Select all results"
                 />
               </th>
               <th
                 onClick={() => handleSort('title')}
-                className="border border-gray-200 p-3 cursor-pointer hover:bg-blue-200 transition font-semibold text-left"
+                className="cursor-pointer hover:bg-blue-700 transition-all duration-200"
                 role="columnheader"
                 aria-sort={sortField === 'title' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
@@ -156,7 +163,7 @@ const ResultsTable: React.FC = () => {
               </th>
               <th
                 onClick={() => handleSort('html_version')}
-                className="border border-gray-200 p-3 cursor-pointer hover:bg-blue-200 transition font-semibold text-left"
+                className="cursor-pointer hover:bg-blue-700 transition-all duration-200"
                 role="columnheader"
                 aria-sort={sortField === 'html_version' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
@@ -164,7 +171,7 @@ const ResultsTable: React.FC = () => {
               </th>
               <th
                 onClick={() => handleSort('h1_count')}
-                className="border border-gray-200 p-3 cursor-pointer hover:bg-blue-200 transition font-semibold text-left"
+                className="cursor-pointer hover:bg-blue-700 transition-all duration-200"
                 role="columnheader"
                 aria-sort={sortField === 'h1_count' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
@@ -172,7 +179,7 @@ const ResultsTable: React.FC = () => {
               </th>
               <th
                 onClick={() => handleSort('h2_count')}
-                className="border border-gray-200 p-3 cursor-pointer hover:bg-blue-200 transition font-semibold text-left"
+                className="cursor-pointer hover:bg-blue-700 transition-all duration-200"
                 role="columnheader"
                 aria-sort={sortField === 'h2_count' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
@@ -180,7 +187,7 @@ const ResultsTable: React.FC = () => {
               </th>
               <th
                 onClick={() => handleSort('h3_count')}
-                className="border border-gray-200 p-3 cursor-pointer hover:bg-blue-200 transition font-semibold text-left"
+                className="cursor-pointer hover:bg-blue-700 transition-all duration-200"
                 role="columnheader"
                 aria-sort={sortField === 'h3_count' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
@@ -188,7 +195,7 @@ const ResultsTable: React.FC = () => {
               </th>
               <th
                 onClick={() => handleSort('h4_count')}
-                className="border border-gray-200 p-3 cursor-pointer hover:bg-blue-200 transition font-semibold text-left"
+                className="cursor-pointer hover:bg-blue-700 transition-all duration-200"
                 role="columnheader"
                 aria-sort={sortField === 'h4_count' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
@@ -196,7 +203,7 @@ const ResultsTable: React.FC = () => {
               </th>
               <th
                 onClick={() => handleSort('h5_count')}
-                className="border border-gray-200 p-3 cursor-pointer hover:bg-blue-200 transition font-semibold text-left"
+                className="cursor-pointer hover:bg-blue-700 transition-all duration-200"
                 role="columnheader"
                 aria-sort={sortField === 'h5_count' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
@@ -204,7 +211,7 @@ const ResultsTable: React.FC = () => {
               </th>
               <th
                 onClick={() => handleSort('h6_count')}
-                className="border border-gray-200 p-3 cursor-pointer hover:bg-blue-200 transition font-semibold text-left"
+                className="cursor-pointer hover:bg-blue-700 transition-all duration-200"
                 role="columnheader"
                 aria-sort={sortField === 'h6_count' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
@@ -212,7 +219,7 @@ const ResultsTable: React.FC = () => {
               </th>
               <th
                 onClick={() => handleSort('internal_links')}
-                className="border border-gray-200 p-3 cursor-pointer hover:bg-blue-200 transition font-semibold text-left"
+                className="cursor-pointer hover:bg-blue-700 transition-all duration-200"
                 role="columnheader"
                 aria-sort={sortField === 'internal_links' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
@@ -220,15 +227,23 @@ const ResultsTable: React.FC = () => {
               </th>
               <th
                 onClick={() => handleSort('external_links')}
-                className="border border-gray-200 p-3 cursor-pointer hover:bg-blue-200 transition font-semibold text-left"
+                className="cursor-pointer hover:bg-blue-700 transition-all duration-200"
                 role="columnheader"
                 aria-sort={sortField === 'external_links' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
                 External Links
               </th>
               <th
+                onClick={() => handleSort('broken_links')}
+                className="cursor-pointer hover:bg-blue-700 transition-all duration-200"
+                role="columnheader"
+                aria-sort={sortField === 'broken_links' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
+              >
+                Broken Links
+              </th>
+              <th
                 onClick={() => handleSort('status')}
-                className="border border-gray-200 p-3 cursor-pointer hover:bg-blue-200 transition font-semibold text-left"
+                className="cursor-pointer hover:bg-blue-700 transition-all duration-200"
                 role="columnheader"
                 aria-sort={sortField === 'status' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
@@ -239,7 +254,7 @@ const ResultsTable: React.FC = () => {
           <tbody>
             {paginatedResults.length === 0 ? (
               <tr>
-                <td colSpan={12} className="border border-gray-200 p-3 text-center text-gray-600">
+                <td colSpan={13} className="text-center text-gray-600 font-medium">
                   No results match the current filters.
                 </td>
               </tr>
@@ -247,57 +262,58 @@ const ResultsTable: React.FC = () => {
               paginatedResults.map((result, index) => (
                 <tr
                   key={result.id}
-                  className={`hover:bg-blue-50 transition ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}
+                  className={`${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:scale-105 transition-all duration-300`}
                 >
-                  <td className="border border-gray-200 p-3">
+                  <td>
                     <input
                       type="checkbox"
                       checked={selectedIds.includes(result.id)}
                       onChange={() => handleSelect(result.id)}
-                      className="rounded"
+                      className="rounded text-blue-600 focus:ring-blue-300"
                       aria-label={`Select result for ${result.title || 'No Title'}`}
                     />
                   </td>
-                  <td className="border border-gray-200 p-3">
+                  <td>
                     <Link
                       to={`/details/${result.id}`}
-                      className="text-blue-600 hover:text-blue-800 hover:underline"
+                      className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
                     >
                       {result.title || 'No Title'}
                     </Link>
                   </td>
-                  <td className="border border-gray-200 p-3">{result.html_version || 'Unknown'}</td>
-                  <td className="border border-gray-200 p-3">{result.h1_count ?? 0}</td>
-                  <td className="border border-gray-200 p-3">{result.h2_count ?? 0}</td>
-                  <td className="border border-gray-200 p-3">{result.h3_count ?? 0}</td>
-                  <td className="border border-gray-200 p-3">{result.h4_count ?? 0}</td>
-                  <td className="border border-gray-200 p-3">{result.h5_count ?? 0}</td>
-                  <td className="border border-gray-200 p-3">{result.h6_count ?? 0}</td>
-                  <td className="border border-gray-200 p-3">{result.internal_links ?? 0}</td>
-                  <td className="border border-gray-200 p-3">{result.external_links ?? 0}</td>
-                  <td className="border border-gray-200 p-3">{result.status || 'unknown'}</td>
+                  <td>{result.html_version || 'Unknown'}</td>
+                  <td>{result.h1_count ?? 0}</td>
+                  <td>{result.h2_count ?? 0}</td>
+                  <td>{result.h3_count ?? 0}</td>
+                  <td>{result.h4_count ?? 0}</td>
+                  <td>{result.h5_count ?? 0}</td>
+                  <td>{result.h6_count ?? 0}</td>
+                  <td>{result.internal_links ?? 0}</td>
+                  <td>{result.external_links ?? 0}</td>
+                  <td>{result.broken_links?.length ?? 0}</td>
+                  <td>{result.status || 'unknown'}</td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
       </div>
-      <div className="flex justify-between items-center mt-6">
+      <div className="flex justify-between items-center mt-8">
         <button
           onClick={() => setPage(page - 1)}
           disabled={page === 1}
-          className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
+          className="p-4 bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-xl shadow-md hover:from-blue-700 hover:to-blue-500 disabled:from-gray-400 disabled:to-gray-300 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-300"
           aria-label="Previous page"
         >
           Previous
         </button>
-        <span className="text-gray-700" aria-live="polite">
+        <span className="text-gray-800 font-medium" aria-live="polite">
           Page {page} of {Math.ceil(filteredResults.length / 10)}
         </span>
         <button
           onClick={() => setPage(page + 1)}
           disabled={page * 10 >= filteredResults.length}
-          className="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
+          className="p-4 bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-xl shadow-md hover:from-blue-700 hover:to-blue-500 disabled:from-gray-400 disabled:to-gray-300 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-300"
           aria-label="Next page"
         >
           Next
