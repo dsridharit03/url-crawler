@@ -13,13 +13,12 @@ const axiosInstance = axios.create({
 export const postUrl = async (url: string): Promise<UrlResult> => {
   try {
     const response = await axiosInstance.post('/urls', { url });
-    console.log('postUrl Response:', response.data);
     return response.data;
   } catch (err) {
     const message = axios.isAxiosError(err) && err.response?.data?.error
       ? `Failed to submit URL: ${err.response.status} - ${err.response.data.error}`
       : `Failed to submit URL: ${err.message}`;
-    console.error('postUrl Error:', message);
+    console.error('postUrl Error:', err);
     throw new Error(message);
   }
 };
@@ -27,13 +26,12 @@ export const postUrl = async (url: string): Promise<UrlResult> => {
 export const getResults = async (): Promise<UrlResult[]> => {
   try {
     const response = await axiosInstance.get('/results');
-    console.log('getResults Response:', response.data);
     return response.data;
   } catch (err) {
     const message = axios.isAxiosError(err) && err.response?.data?.error
       ? `Failed to fetch results: ${err.response.status} - ${err.response.data.error}`
       : `Failed to fetch results: ${err.message}`;
-    console.error('getResults Error:', message);
+    console.error('getResults Error:', err);
     throw new Error(message);
   }
 };

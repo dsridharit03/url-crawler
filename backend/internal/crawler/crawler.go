@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 	"url-crawler/internal/models"
 
 	"github.com/gocolly/colly/v2"
@@ -28,9 +29,13 @@ func Crawl(ctx context.Context, rawURL string) (*models.UrlResult, error) {
 		InternalLinks: 0,
 		ExternalLinks: 0,
 	}
+
 	c := colly.NewCollector(
 		colly.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"),
+		colly.MaxDepth(1),
+		colly.Async(true),
 	)
+	c.SetRequestTimeout(60 * time.Second)
 
 	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
@@ -42,10 +47,30 @@ func Crawl(ctx context.Context, rawURL string) (*models.UrlResult, error) {
 	fmt.Println("Parsed Base Host:", baseHost)
 
 	c.OnHTML("html", func(e *colly.HTMLElement) {
-		doctype := e.DOM.ParentsUntil("~").First().Text()
+		doctype := e.Request.Ctx.Get("doctype")
+		if doctype == "" {
+			doctype = e.DOM.ParentsUntil("~").First().Text()
+		}
 		fmt.Println("Doctype:", doctype)
-		if strings.Contains(strings.ToLower(doctype), "html") {
+		doctypeLower := strings.ToLower(strings.TrimSpace(doctype))
+		if strings.Contains(doctypeLower, "<!doctype html") || strings.Contains(doctypeLower, "html 5") {
 			result.HTMLVersion = "HTML5"
+		} else if strings.Contains(doctypeLower, "html 4") {
+			result.HTMLVersion = "HTML4"
+		} else if strings.Contains(doctypeLower, "xhtml") {
+			result.HTMLVersion = "XHTML"
+		} else {
+			result.HTMLVersion = "Other"
+		}
+	})
+
+	c.OnResponse(func(r *colly.Response) {
+		body := string(r.Body)
+		if strings.HasPrefix(strings.ToLower(body), "<!doctype") {
+			end := strings.Index(body, ">")
+			if end > 0 {
+				r.Ctx.Put("doctype", body[:end+1])
+			}
 		}
 	})
 
@@ -78,23 +103,17 @@ func Crawl(ctx context.Context, rawURL string) (*models.UrlResult, error) {
 	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
 		link := e.Attr("href")
 		fmt.Println("Link:", link)
-		if strings.HasPrefix(link, "http") {
-			if strings.Contains(link, baseHost) {
+		absoluteLink := resolveURL(link, rawURL)
+		if strings.HasPrefix(absoluteLink, "http") {
+			if strings.Contains(absoluteLink, baseHost) {
 				result.InternalLinks++
 			} else {
 				result.ExternalLinks++
 			}
-			resp, err := http.Head(link)
-			statusCode := 0
-			if resp != nil {
-				statusCode = resp.StatusCode
-			}
-			if err != nil {
-				fmt.Println("Link Check Error:", link, err)
-			}
-			fmt.Println("Link Check:", link, "Status:", statusCode)
-			if err != nil || (resp != nil && resp.StatusCode >= 400) {
-				result.BrokenLinks = append(result.BrokenLinks, models.BrokenLink{URL: link, StatusCode: statusCode})
+			statusCode, err := checkLink(absoluteLink)
+			if err != nil || statusCode >= 400 {
+				fmt.Println("Broken Link:", absoluteLink, "Status:", statusCode, "Error:", err)
+				result.BrokenLinks = append(result.BrokenLinks, models.BrokenLink{URL: absoluteLink, StatusCode: statusCode})
 			}
 		}
 	})
@@ -113,10 +132,22 @@ func Crawl(ctx context.Context, rawURL string) (*models.UrlResult, error) {
 		result.Status = "error"
 	})
 
+	c.OnRequest(func(r *colly.Request) {
+		r.Headers.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+		r.Headers.Set("Accept-Language", "en-US,en;q=0.5")
+	})
+
 	fmt.Println("Visiting URL:", rawURL)
-	err = c.Visit(rawURL)
+	for i := 0; i < 3; i++ {
+		err = c.Visit(rawURL)
+		if err == nil {
+			break
+		}
+		fmt.Println("Retry Attempt:", i+1, "Error:", err)
+		time.Sleep(2 * time.Second)
+	}
 	if err != nil {
-		fmt.Println("Visit Error:", err)
+		fmt.Println("Visit Error after retries:", err)
 		result.Status = "error"
 		return result, err
 	}
@@ -127,4 +158,39 @@ func Crawl(ctx context.Context, rawURL string) (*models.UrlResult, error) {
 	}
 	fmt.Println("Crawl Result:", result)
 	return result, nil
+}
+
+func resolveURL(link, baseURL string) string {
+	if strings.HasPrefix(link, "http") {
+		return link
+	}
+	base, err := url.Parse(baseURL)
+	if err != nil {
+		return link
+	}
+	rel, err := url.Parse(link)
+	if err != nil {
+		return link
+	}
+	return base.ResolveReference(rel).String()
+}
+
+func checkLink(link string) (int, error) {
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+	req, err := http.NewRequest("HEAD", link, nil)
+	if err != nil {
+		return 0, err
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+	for i := 0; i < 3; i++ {
+		resp, err := client.Do(req)
+		if err == nil && resp != nil {
+			defer resp.Body.Close()
+			return resp.StatusCode, nil
+		}
+		time.Sleep(2 * time.Second)
+	}
+	return 0, err
 }

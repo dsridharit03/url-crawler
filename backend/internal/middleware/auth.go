@@ -1,33 +1,37 @@
 package middleware
 
 import (
+	"net/http"
+	"strings"
+
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
-// Optional Auth middleware (currently pass-through)
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.Request.URL.Path == "/urls" {
-			c.Next() // Skip auth for /urls endpoint
+		if c.Request.URL.Path == "/auth" ||
+			c.Request.URL.Path == "/urls" ||
+			(c.Request.URL.Path == "/results" && c.Request.Method == "GET") ||
+			(strings.HasPrefix(c.Request.URL.Path, "/results/") && c.Request.Method == "DELETE") {
+			c.Next()
 			return
 		}
-		c.Next() // Temporarily skip auth for all endpoints for testing
-	}
-}
-
-// ✅ CORS middleware for frontend/backend interaction
-func CORSMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header required"})
+			c.Abort()
 			return
 		}
-
+		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+			return []byte("secret"), nil
+		})
+		if err != nil || !token.Valid {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			c.Abort()
+			return
+		}
 		c.Next()
 	}
 }

@@ -80,16 +80,20 @@
             id="rerunBtn"
             class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center"
           >
-            <span>Re-run Selected</span>
+            <span id="rerunText">Re-run Selected</span>
             <span id="rerunSpinner" class="ml-2 hidden">
               <i class="fas fa-spinner fa-spin"></i>
             </span>
           </button>
           <button
             onclick="deleteSelected()"
-            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+            id="deleteBtn"
+            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition flex items-center"
           >
-            Delete Selected
+            <span id="deleteText">Delete Selected</span>
+            <span id="deleteSpinner" class="ml-2 hidden">
+              <i class="fas fa-spinner fa-spin"></i>
+            </span>
           </button>
         </div>
       </div>
@@ -151,6 +155,9 @@
     const analyzeSpinner = document.getElementById('analyzeSpinner');
     const rerunBtn = document.getElementById('rerunBtn');
     const rerunSpinner = document.getElementById('rerunSpinner');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const deleteText = document.getElementById('deleteText');
+    const deleteSpinner = document.getElementById('deleteSpinner');
     const prevPageBtn = document.getElementById('prevPage');
     const nextPageBtn = document.getElementById('nextPage');
     const pageInfo = document.getElementById('pageInfo');
@@ -370,78 +377,48 @@
 
     // Delete selected URLs
     async function deleteSelected() {
-    const selectedCheckboxes = document.querySelectorAll('.rowCheckbox:checked');
-    
-    if (selectedCheckboxes.length === 0) {
+      const selectedCheckboxes = document.querySelectorAll('.rowCheckbox:checked');
+      
+      if (selectedCheckboxes.length === 0) {
         alert('Please select at least one URL');
         return;
-    }
-
-    const selectedCount = selectedCheckboxes.length;
-    if (!confirm(`Delete ${selectedCount} selected URL(s)? This cannot be undone.`)) {
+      }
+      
+      const urlText = selectedCheckboxes.length === 1 ? 'URL' : 'URLs';
+      if (!confirm(`Are you sure you want to delete ${selectedCheckboxes.length} selected ${urlText}? This cannot be undone.`)) {
         return;
-    }
-
-    try {
-        // Get the token from where you store it (localStorage, cookies, etc.)
-        const token = localStorage.getItem('token'); // Adjust based on your auth storage
+      }
+      
+      // Show loading state
+      deleteSpinner.classList.remove('hidden');
+      deleteText.textContent = 'Deleting...';
+      deleteBtn.disabled = true;
+      
+      try {
+        const ids = Array.from(selectedCheckboxes).map(cb => cb.dataset.id);
         
-        if (!token) {
-        alert('Authorization token missing. Please log in again.');
-        return;
-        }
-
-        const deletePromises = [];
-        const failedDeletions = [];
-        
-        for (const checkbox of selectedCheckboxes) {
-        const id = checkbox.dataset.id;
-        deletePromises.push(
-            fetch(`${API_BASE_URL}/results/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-            })
-            .then(async response => {
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `Failed to delete ID ${id}`);
-            }
-            return id;
-            })
-            .catch(error => {
-            failedDeletions.push({id, error: error.message});
-            return null;
-            })
-        );
-        }
-
-        const results = await Promise.all(deletePromises);
-        const successfulDeletions = results.filter(id => id !== null);
-
-        if (failedDeletions.length > 0) {
-        let errorMessage = `Failed to delete ${failedDeletions.length} URL(s):\n`;
-        failedDeletions.forEach(f => {
-            errorMessage += `• ID ${f.id}: ${f.error}\n`;
-        });
-        
-        if (successfulDeletions.length > 0) {
-            errorMessage = `Deleted ${successfulDeletions.length} URL(s) successfully.\n\n${errorMessage}`;
+        // Delete each selected URL
+        for (const id of ids) {
+          const response = await fetch(`${API_BASE_URL}/results/${id}`, {
+            method: 'DELETE'
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Failed to delete URL with ID ${id}`);
+          }
         }
         
-        alert(errorMessage);
-        } else {
-        alert(`Successfully deleted ${successfulDeletions.length} URL(s)`);
-        }
-
+        alert(`Successfully deleted ${ids.length} ${urlText}`);
         await fetchResults();
-        
-    } catch (error) {
+      } catch (error) {
         console.error('Error deleting URLs:', error);
         alert('Error deleting URLs: ' + error.message);
-    }
+      } finally {
+        // Reset button state
+        deleteText.textContent = 'Delete Selected';
+        deleteSpinner.classList.add('hidden');
+        deleteBtn.disabled = false;
+      }
     }
 
     // Pagination handlers

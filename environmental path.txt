@@ -5,5 +5,4 @@ step 2:
 python -m venv .venv_url
 step 3:
 .\.venv_url\Scripts\Activate
-step 3:
-cd C:\Sridhar\Python\AI_Agent\Apply_job_Copy_working_Sridhar\Auto_job_applier_linkedIn-main
+

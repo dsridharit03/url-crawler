@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS url_crawler;
 USE url_crawler;
 
-CREATE TABLE results (
+CREATE TABLE IF NOT EXISTS results (
     id INT AUTO_INCREMENT PRIMARY KEY,
     url VARCHAR(255) NOT NULL,
     title TEXT,
