@@ -7,10 +7,17 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Node.js
+/frontend/node_modules
+/frontend/dist
+/frontend/dist-ssr
 *.local
+
+# Go
+/backend/vendor
+/backend/crawler.db
+*.exe
+*.exe~
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +29,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Miscellaneous
+*.csv
+*.zip

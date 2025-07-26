@@ -1,6 +1,6 @@
 VS Code:
 Step 1:
-cd C:\Sridhar\Python\AI_Projects\Webapp_url_crawler
+cd C:\Sridhar\Python\AI_Projects\url_crawler
 step 2:
 python -m venv .venv_url
 step 3:

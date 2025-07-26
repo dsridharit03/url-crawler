@@ -97,7 +97,7 @@ func DeleteResultHandler(db *sql.DB) gin.HandlerFunc {
 		id := c.Param("id")
 		fmt.Printf("Attempting to delete ID: %s\n", id)
 		var exists bool
-		err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM results WHERE id = ?)", id).Scan(&exists)
+		err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM results WHERE id = $1)", id).Scan(&exists)
 		if err != nil {
 			fmt.Printf("Error checking existence for ID %s: %v\n", id, err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error: " + err.Error()})
@@ -108,7 +108,7 @@ func DeleteResultHandler(db *sql.DB) gin.HandlerFunc {
 			c.JSON(http.StatusNotFound, gin.H{"error": "No record found with ID " + id})
 			return
 		}
-		result, err := db.Exec("DELETE FROM results WHERE id = ?", id)
+		result, err := db.Exec("DELETE FROM results WHERE id = $1", id)
 		if err != nil {
 			fmt.Printf("Database error deleting ID %s: %v\n", id, err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error: " + err.Error()})
@@ -127,37 +127,5 @@ func DeleteResultHandler(db *sql.DB) gin.HandlerFunc {
 		}
 		fmt.Printf("Successfully deleted ID: %s\n", id)
 		c.JSON(http.StatusOK, gin.H{"message": "Successfully deleted URL with ID " + id})
-	}
-}
-
-func RerunCrawlHandler(db *sql.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		id := c.Param("id")
-		results, err := dbpkg.GetResults(db)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		var targetURL string
-		for _, r := range results {
-			if fmt.Sprintf("%d", r.ID) == id {
-				targetURL = r.URL
-				break
-			}
-		}
-		if targetURL == "" {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Result not found"})
-			return
-		}
-		result, err := crawler.Crawl(c, targetURL)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Re-crawling failed"})
-			return
-		}
-		if err := dbpkg.SaveResult(db, result); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update crawl result"})
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{"message": "Re-crawled successfully", "url": targetURL})
 	}
 }
