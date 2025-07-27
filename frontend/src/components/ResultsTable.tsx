@@ -10,7 +10,8 @@ import React, { useState, useEffect } from 'react';
        const [isDeleting, setIsDeleting] = useState(false);
 
         //const API_BASE_URL = 'http://localhost:8082';
-       const API_BASE_URL = 'https://url-crawler-backend.onrender.com';
+       //const API_BASE_URL = 'https://url-crawler-backend.onrender.com';
+       const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://url-crawler-backend.onrender.com';
 
        useEffect(() => {
            fetchResults();
