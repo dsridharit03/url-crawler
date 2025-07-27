@@ -1,11 +1,12 @@
+# Build stage
 FROM node:18 AS builder
 WORKDIR /app
-COPY package.json ./
-COPY package-lock.json ./
+COPY package.json package-lock.json ./
 RUN npm install
 COPY . .
 RUN npm run build
 
+# Serve stage
 FROM node:18
 WORKDIR /app
 RUN npm install -g serve
