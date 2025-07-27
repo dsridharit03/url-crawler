@@ -9,7 +9,8 @@ import React, { useState, useEffect } from 'react';
        const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
        const [isDeleting, setIsDeleting] = useState(false);
 
-       const API_BASE_URL = 'http://localhost:8082';
+        const API_BASE_URL = 'http://localhost:8082';
+       //const API_BASE_URL = 'https://url-crawler.onrender.com';
 
        useEffect(() => {
            fetchResults();

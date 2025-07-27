@@ -8,7 +8,7 @@ services:
     ports:
       - "8082:8082"
     environment:
-      - DATABASE_URL=postgres://postgres:password@postgres:5432/crawler_db?sslmode=disable
+      - DATABASE_URL=postgresql://crawler_db_zdd3_user:iF0txIHnkPbvGhvlfsAqQJvYxUQVtREq@dpg-d22rk4m3jp1c7397noj0-a/crawler_db_zdd3
       - PORT=8082
       - GIN_MODE=debug
       - ALLOWED_ORIGINS=http://localhost:5173

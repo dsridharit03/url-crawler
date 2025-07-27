@@ -18,6 +18,35 @@ lerna-debug.log*
 /backend/crawler.db
 *.exe
 *.exe~
+*.dll
+*.so
+*.dylib
+/backend/main
+
+# Python
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+env/
+.venv*/
+*.egg-info/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Docker
+docker-compose.yml.bak
+*.log
+docker-compose.override.yml
+
+# Environment variables
+.env
+*.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Editor directories and files
 .vscode/*
@@ -29,7 +58,18 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*.swo
+
+# Database
+postgres_data/
 
 # Miscellaneous
 *.csv
 *.zip
+*.tar.gz
+*.tgz
+
+# Render-specific
+/backend/static/*.js.map
+/backend/static/*.css.map
