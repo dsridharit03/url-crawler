@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: url-crawler-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile.prod
+    plan: free
+    port: 8082
+    envVars:
+      - key: DATABASE_URL
+        fromService:
+          name: url-crawler-db
+          type: postgres
+          property: connectionString
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://url-crawler-frontend.onrender.com
+
+  - type: web
+    name: url-crawler-frontend
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile.prod
+    plan: free
+    port: 3000
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://url-crawler-backend.onrender.com
+
+  - type: postgres
+    name: url-crawler-db
+    plan: free
+    ipAllowList: []
+    databaseName: url_crawler
