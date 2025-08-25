@@ -4,7 +4,7 @@ services:
     env: docker
     dockerfilePath: ./backend/Dockerfile.prod
     plan: free
-    port: 8080
+    port: 8082
     envVars:
       - key: DATABASE_URL
         fromService:
@@ -19,7 +19,7 @@ services:
     env: docker
     dockerfilePath: ./frontend/Dockerfile.prod
     plan: free
-    port: 80
+    port: 3000
     envVars:
       - key: REACT_APP_API_URL
         value: https://url-crawler-backend.onrender.com

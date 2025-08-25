@@ -6,6 +6,13 @@ python -m venv .venv_url
 step 3:
 .\.venv_url\Scripts\Activate
 
-run the script with Docker
-(.venv_url) PS C:\Sridhar\Python\AI_Projects\url_crawler> docker-compose up --build
+Step 4:
+cd C:\Sridhar\Python\AI_Projects\url_crawler
+
+docker-compose up --build
+
+Step 5:
+http://localhost:8082
+
+
 
