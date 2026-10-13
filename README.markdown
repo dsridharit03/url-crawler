@@ -2,6 +2,9 @@
 
 ![URL Crawler Banner](https://via.placeholder.com/1200x200.png?text=URL+Crawler+-+Analyze+Websites+Instantly)
 
+<img width="1858" height="945" alt="Url_Crawler" src="https://github.com/user-attachments/assets/1a85edac-303b-4ccd-a635-ec8a0bf74cf0" />
+
+
 **A sleek and powerful web application to crawl and analyze websites with ease.** Built with a **Go** backend and a **React + TypeScript** frontend, URL Crawler extracts critical metadata like HTML version, headings, links, and login form presence, presenting it in an intuitive UI. Perfect for developers, SEO professionals, and web enthusiasts looking to dive deep into website structures.
 
 [![Go Version](https://img.shields.io/badge/Go-1.20+-00ADD8?style=flat-square&logo=go)](https://golang.org)
