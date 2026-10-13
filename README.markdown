@@ -13,7 +13,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=flat-square&logo=docker)](https://www.docker.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](https://opensource.org/licenses/MIT)
 
-![Demo GIF](https://via.placeholder.com/800x400.png?text=URL+Crawler+Demo) <!-- Replace with actual demo GIF or screenshot -->
+ <!-- Replace with actual demo GIF or screenshot -->
 
 ---
 
